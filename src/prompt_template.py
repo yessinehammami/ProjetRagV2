@@ -12,7 +12,7 @@ Tu peux utiliser les informations suivantes extraites des documents pour formule
 {context}
 
 et voici les messages précédents :
-{hystory}
+{history}
 Réponse :
 """
 

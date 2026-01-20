@@ -38,7 +38,7 @@ if prompt := st.chat_input("Votre question"):
 
     docs = retriever.invoke(prompt)
     context_text = "\n".join([doc.page_content for doc in docs])
-    filled_prompt = pt.format(query=prompt, context=context_text, hystory=st.session_state.messages)
+    filled_prompt = pt.format(query=prompt, context=context_text, history=st.session_state.messages)
 
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -47,6 +47,8 @@ if prompt := st.chat_input("Votre question"):
     with st.chat_message("assistant"):
        response = st.write_stream(llm.stream(filled_prompt))
     st.session_state.messages.append({"role": "assistant", "content": response})
+    
+    st.markdown(f'voici les sources: {docs[1]}')
 
 
 
