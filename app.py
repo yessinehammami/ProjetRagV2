@@ -36,10 +36,13 @@ if user_query:
     context_text = "\n".join([doc.page_content for doc in docs])
 
     filled_prompt = pt.format(query=user_query, context=context_text)
-    response = llm.invoke(filled_prompt)
 
     st.subheader("Réponse de l'assistant :")
-    st.write(response.content)
+    response_placeholder = st.empty()
+    partial_response = ""
+    for chunk in llm.stream(filled_prompt):  
+        partial_response += chunk.content  
+        response_placeholder.write(partial_response)
 
     st.subheader("Prompt :")
     st.write(filled_prompt)
