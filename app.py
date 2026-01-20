@@ -29,19 +29,20 @@ st.markdown(
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         
 if prompt := st.chat_input("Votre question"):
 
+    docs = retriever.invoke(prompt)
+    context_text = "\n".join([doc.page_content for doc in docs])
+    filled_prompt = pt.format(query=prompt, context=context_text, hystory=st.session_state.messages)
+
     with st.chat_message("user"):
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
-
-    docs = retriever.invoke(prompt)
-    context_text = "\n".join([doc.page_content for doc in docs])
-    filled_prompt = pt.format(query=prompt, context=context_text)
          
     with st.chat_message("assistant"):
        response = st.write_stream(llm.stream(filled_prompt))
