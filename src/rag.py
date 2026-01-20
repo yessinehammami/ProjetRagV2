@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 all_docs = []
-data_path = Path(__file__).resolve().parent.parent / "data"
+data_path = Path("./data")
 
 if not data_path.exists() or not data_path.is_dir():
     raise FileNotFoundError(f"Data directory not found at: {data_path}")
