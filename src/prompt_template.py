@@ -10,10 +10,13 @@ Question:
 
 Tu peux utiliser les informations suivantes extraites des documents pour formuler ta réponse :
 {context}
+
+et voici les messages précédents :
+{hystory}
 Réponse :
 """
 
 pt = PromptTemplate(
-    input_variables=["query", "context"],
+    input_variables=["query", "context","hystory"],
     template=template
 )
