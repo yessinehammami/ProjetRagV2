@@ -1,7 +1,6 @@
 import os
 from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
-from typer import prompt
 from src.prompt_template import pt
 from src.rag import retriever
 load_dotenv()
@@ -20,26 +19,35 @@ llm = AzureChatOpenAI(
 	)
 import streamlit as st
 
-st.set_page_config(page_title="Infos sur WW1", layout="wide")
 
-st.title("Assistant WW1")
-st.caption("Pose une question.")
+st.title("RAG Premiere Guerre Mondiale")
+st.markdown(
+    """ 
+    Ce site permet d'intéroger un model d'intéligence artificielle sur la Premiere Uerre Mondiale. 
+    """
+)
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Simple text input for user query
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        
+if prompt := st.chat_input("Votre question"):
 
-user_query = st.text_input("Ecris ta question ici :", "")
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
 
-
-if user_query:
-	
-    docs = retriever.invoke(user_query)
+    docs = retriever.invoke(prompt)
     context_text = "\n".join([doc.page_content for doc in docs])
+    filled_prompt = pt.format(query=prompt, context=context_text)
+         
+    with st.chat_message("assistant"):
+       response = st.write_stream(llm.stream(filled_prompt))
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
-    filled_prompt = pt.format(query=user_query, context=context_text)
-    response = llm.invoke(filled_prompt)
 
-    st.subheader("Réponse de l'assistant :")
-    st.write(response.content)
 
-    st.subheader("Prompt :")
-    st.write(filled_prompt)
+	
+
