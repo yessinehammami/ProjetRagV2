@@ -55,9 +55,16 @@ if prompt := st.chat_input("Posez votre question..."):
        response = st.write_stream(llm.stream(filled_prompt))
     st.session_state.messages.append({"role": "assistant", "content": response})
     
-    st.markdown(f'voici les sources: {docs[1]}')
+    resources = [doc.metadata['source'] for doc in docs]
 
-    print(docs)
+    st.write("Sources utilisées :", "\n")
+    unique_resources = set()
+    for resource in resources:
+        trimmed = resource[5:]
+        if trimmed not in unique_resources:
+            st.write(trimmed)
+            unique_resources.add(trimmed)
+
 
 with st.sidebar:
     st.title("RAG Première Guerre Mondiale")
