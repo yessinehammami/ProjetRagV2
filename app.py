@@ -2,7 +2,7 @@ import os
 from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
 from src.prompt_template import pt
-from src.rag import retriever
+from src.rag import preprocess_pdfs, retriever, vectorstore
 load_dotenv()
 
 endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -20,10 +20,10 @@ llm = AzureChatOpenAI(
 import streamlit as st
 
 
-st.title("RAG Premiere Guerre Mondiale")
+st.title("RAG Guerres Mondiales")
 st.markdown(
     """ 
-    Ce site permet d'intéroger un model d'intéligence artificielle sur la Premiere Uerre Mondiale. 
+    Ce site permet d'intéroger un model d'intéligence artificielle sur les guerres mondiales. 
     """
 )
 if "messages" not in st.session_state:
@@ -34,6 +34,20 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         
+if uploaded_file := st.file_uploader("Upload un fichier PDF", type=["pdf"]):
+    save_path = f"data/{uploaded_file.name}"
+    with open(save_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    new_docs = preprocess_pdfs(save_path)
+    vectorstore.add_documents(new_docs)
+    st.success("Fichier PDF ajouté et indexé avec succès !")
+
+    retriever = vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs= {"k":5}
+    )
+    
 if prompt := st.chat_input("Votre question"):
 
     docs = retriever.invoke(prompt)
@@ -49,6 +63,10 @@ if prompt := st.chat_input("Votre question"):
     st.session_state.messages.append({"role": "assistant", "content": response})
     
     st.markdown(f'voici les sources: {docs[1]}')
+
+    print(docs)
+
+
 
 
 
