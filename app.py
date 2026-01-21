@@ -19,13 +19,6 @@ llm = AzureChatOpenAI(
 	)
 import streamlit as st
 
-
-st.title("RAG Guerres Mondiales")
-st.markdown(
-    """ 
-    Ce site permet d'intéroger un model d'intéligence artificielle sur les guerres mondiales. 
-    """
-)
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -48,7 +41,7 @@ if uploaded_file := st.file_uploader("Upload un fichier PDF", type=["pdf"]):
     search_kwargs= {"k":5}
     )
     
-if prompt := st.chat_input("Votre question"):
+if prompt := st.chat_input("Posez votre question..."):
 
     docs = retriever.invoke(prompt)
     context_text = "\n".join([doc.page_content for doc in docs])
@@ -65,6 +58,21 @@ if prompt := st.chat_input("Votre question"):
     st.markdown(f'voici les sources: {docs[1]}')
 
     print(docs)
+
+with st.sidebar:
+    st.title("RAG Première Guerre Mondiale")
+    st.markdown(
+    """ 
+    Ce site permet d'interroger un modèle d'intelligence artificielle sur la Première Guerre Mondiale. 
+    """
+    )
+
+    st.container(height=500, border=False)
+
+    if st.button("Supprimer l'historique", type="primary", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
+
 
 
 
