@@ -3,6 +3,8 @@ from langchain_openai import AzureChatOpenAI
 from dotenv import load_dotenv
 from src.prompt_template import pt
 from src.rag import retriever
+
+
 load_dotenv()
 
 endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -26,6 +28,22 @@ st.markdown(
     Ce site permet d'intéroger un model d'intéligence artificielle sur la Premiere Uerre Mondiale. 
     """
 )
+
+
+if uploaded_files := st.file_uploader(
+    "Sélectionnez des fichiers a importer",
+    accept_multiple_files=True
+) :
+    st.write(f"{len(uploaded_files)} fichier(s) sélectionné(s)")
+    for file in uploaded_files:
+        st.write(file.name)
+        
+if st.button("uploader les documents"):
+    st.markdown(",") # place holder
+
+
+
+    
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
